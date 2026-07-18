@@ -10,6 +10,7 @@ export const PRODUCTS = [
 ];
 
 export const DEFAULT_ADDRESS = {
+  id: 'addr-1',
   label: 'Kantor Cabang Bandung',
   name: 'Dinda Mareta Putri',
   phone: '6281234567890',
@@ -17,3 +18,33 @@ export const DEFAULT_ADDRESS = {
     'Jl. Holis Regency No.37A, Kelurahan Sukahaji, Kecamatan Babakan Ciparay, Kota Bandung, Jawa Barat 40221.',
   note: 'Dekat dengan halte batam',
 };
+
+export const ADDRESS_BOOK = [
+  {
+    id: 'addr-1',
+    isPrimary: true,
+    labelAlamat: 'Kantor',
+    name: 'Namora',
+    phone: '082111111111',
+    address: 'Jl. Holis Regency No.37A, Babakan Babakan Ciparay, Bandung City, West Java 40222',
+    pinpoint: true,
+  },
+  {
+    id: 'addr-2',
+    isPrimary: false,
+    labelAlamat: 'Kantor',
+    name: 'Namora',
+    phone: '082111111111',
+    address: 'Jl. Holis Regency No.37A, Babakan Babakan Ciparay, Bandung City, West Java 40222',
+    pinpoint: true,
+  },
+  {
+    id: 'addr-3',
+    isPrimary: false,
+    labelAlamat: 'Kantor',
+    name: 'Namora',
+    phone: '082111111111',
+    address: 'Jl. Holis Regency No.37A, Babakan Babakan Ciparay, Bandung City, West Java 40222',
+    pinpoint: true,
+  },
+];
