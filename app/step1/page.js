@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { PRODUCTS, DEFAULT_ADDRESS } from '../data';
+import { PRODUCTS, DEFAULT_ADDRESS, ADDRESS_BOOK } from '../data';
 
 const DAYS = ['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Min'];
 const MONTHS = [
@@ -43,8 +43,12 @@ export default function Step1() {
   const [viewMonth, setViewMonth] = useState(0); // Januari
   const [selectedDate, setSelectedDate] = useState(new Date(2022, 0, 6));
   const [showCalendar, setShowCalendar] = useState(false);
-  const [note, setNote] = useState('Pesanan dimohon tiba sebelum pukul 14.00 WIB.');
+  const [note, setNote] = useState('');
   const [showModal, setShowModal] = useState(false);
+
+  const [address, setAddress] = useState(DEFAULT_ADDRESS);
+  const [showAddressModal, setShowAddressModal] = useState(false);
+  const [addressSearch, setAddressSearch] = useState('');
 
   const [quantities, setQuantities] = useState(
     Object.fromEntries(PRODUCTS.map((p) => [p.no, 0]))
@@ -95,17 +99,27 @@ export default function Step1() {
   }
 
   function confirmAndContinue() {
-    const payload = {
-      address: DEFAULT_ADDRESS,
+    const newLocation = {
+      id: `loc-${Date.now()}`,
+      address,
       date: formatDateID(selectedDate),
       note,
+      products: PRODUCTS.filter((p) => quantities[p.no] > 0).map((p) => ({
+        ...p,
+        jumlah: quantities[p.no],
+      })),
       totalDiatur,
       totalBerat: '1.293 kg',
       kurir: 'Kurir Penyedia',
       ongkosKirim: 'Rp750.000',
     };
     if (typeof window !== 'undefined') {
-      window.localStorage.setItem('inaproc-shipment', JSON.stringify(payload));
+      const raw = window.localStorage.getItem('inaproc-locations');
+      const existing = raw ? JSON.parse(raw) : [];
+      window.localStorage.setItem(
+        'inaproc-locations',
+        JSON.stringify([...existing, newLocation])
+      );
     }
     router.push('/step3');
   }
@@ -149,17 +163,25 @@ export default function Step1() {
           <div className="rounded-xl border border-gray-200 bg-white p-5">
             <div className="mb-3 flex items-center justify-between">
               <h2 className="font-semibold text-gray-900">Dikirim Ke</h2>
-              <button className="text-sm font-medium text-brand hover:underline">
+              <button
+                onClick={() => setShowAddressModal(true)}
+                className="text-sm font-medium hover:underline"
+                style={{ color: '#2B50C8' }}
+              >
                 Ubah Alamat
               </button>
             </div>
-            <p className="font-semibold text-gray-800">{DEFAULT_ADDRESS.label}</p>
+            <p className="font-semibold text-gray-800">{address.label || address.labelAlamat}</p>
             <p className="mt-1 text-sm text-gray-700">
-              {DEFAULT_ADDRESS.name} ({DEFAULT_ADDRESS.phone})
+              {address.name} ({address.phone})
             </p>
-            <p className="mt-1 text-sm text-gray-700">{DEFAULT_ADDRESS.address}</p>
-            <p className="mt-3 text-sm text-gray-400">Catatan:</p>
-            <p className="text-sm text-gray-500">{DEFAULT_ADDRESS.note}</p>
+            <p className="mt-1 text-sm text-gray-700">{address.address}</p>
+            {address.note && (
+              <>
+                <p className="mt-3 text-sm text-gray-400">Catatan:</p>
+                <p className="text-sm text-gray-500">{address.note}</p>
+              </>
+            )}
           </div>
 
           {/* Tanggal Permintaan Tiba */}
@@ -329,12 +351,14 @@ export default function Step1() {
             <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="rounded-xl border border-gray-200 p-4">
                 <h3 className="font-semibold text-gray-900">Dikirim Ke</h3>
-                <p className="mt-2 font-semibold text-gray-800">{DEFAULT_ADDRESS.label}</p>
+                <p className="mt-2 font-semibold text-gray-800">{address.label || address.labelAlamat}</p>
                 <p className="mt-1 text-sm text-gray-600">
-                  {DEFAULT_ADDRESS.name} ({DEFAULT_ADDRESS.phone})
+                  {address.name} ({address.phone})
                 </p>
-                <p className="mt-1 text-sm text-gray-600">{DEFAULT_ADDRESS.address}</p>
-                <p className="mt-2 text-xs text-gray-400">Catatan: {DEFAULT_ADDRESS.note}</p>
+                <p className="mt-1 text-sm text-gray-600">{address.address}</p>
+                {address.note && (
+                  <p className="mt-2 text-xs text-gray-400">Catatan: {address.note}</p>
+                )}
               </div>
               <div className="rounded-xl border border-gray-200 p-4">
                 <h3 className="font-semibold text-gray-900">Ringkasan Produk &amp; Ongkos Kirim</h3>
@@ -412,6 +436,110 @@ export default function Step1() {
               >
                 Ya, Sudah Sesuai
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Address selection modal */}
+      {showAddressModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-2xl bg-white p-6">
+            <div className="mb-4 flex items-center justify-between">
+              <h2 className="text-lg font-bold text-gray-900">Pilih Alamat Pengiriman</h2>
+              <button
+                onClick={() => setShowAddressModal(false)}
+                aria-label="Tutup"
+                className="text-xl text-gray-400 hover:text-gray-700"
+              >
+                ×
+              </button>
+            </div>
+
+            <div className="mb-4 flex gap-3">
+              <input
+                type="text"
+                value={addressSearch}
+                onChange={(e) => setAddressSearch(e.target.value)}
+                placeholder="Cari alamat atau nama penerima"
+                className="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm"
+              />
+              <button
+                onClick={() => alert('Fitur tambah alamat baru belum tersedia di prototype ini.')}
+                className="flex items-center gap-1 whitespace-nowrap rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+              >
+                + Tambah Alamat Baru
+              </button>
+            </div>
+
+            <div className="space-y-3">
+              {ADDRESS_BOOK.filter((a) => {
+                const q = addressSearch.toLowerCase();
+                return (
+                  a.name.toLowerCase().includes(q) || a.address.toLowerCase().includes(q)
+                );
+              }).map((a) => (
+                <div key={a.id} className="rounded-xl border border-gray-200 p-4">
+                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-[1fr_1.4fr_auto]">
+                    <div>
+                      <p className="text-xs text-gray-400">Label Alamat</p>
+                      {a.isPrimary && (
+                        <span className="mb-1 inline-block rounded bg-gray-800 px-2 py-0.5 text-[10px] font-medium text-white">
+                          Alamat Utama
+                        </span>
+                      )}
+                      <p className="font-semibold text-gray-800">{a.labelAlamat}</p>
+                      <p className="mt-2 text-xs text-gray-400">Nama Penerima</p>
+                      <p className="font-semibold text-gray-800">{a.name}</p>
+                      <p className="mt-2 text-xs text-gray-400">Nomor Telepon</p>
+                      <p className="font-semibold text-gray-800">{a.phone}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-400">Alamat</p>
+                      <p className="font-semibold text-gray-800">{a.address}</p>
+                      {a.pinpoint && (
+                        <p className="mt-2 text-xs text-gray-400">📍 Sudah ditandai pinpoint</p>
+                      )}
+                    </div>
+                    <div className="flex items-start justify-end">
+                      <button
+                        onClick={() => {
+                          setAddress({
+                            id: a.id,
+                            label: a.labelAlamat,
+                            name: a.name,
+                            phone: a.phone,
+                            address: a.address,
+                            note: '',
+                          });
+                          setShowAddressModal(false);
+                        }}
+                        className="rounded-lg border border-brand px-4 py-2 text-sm font-semibold text-brand hover:bg-brand-light"
+                      >
+                        Pilih Alamat
+                      </button>
+                    </div>
+                  </div>
+                  {!a.isPrimary && (
+                    <div className="mt-3 flex gap-3 border-t border-gray-100 pt-3 text-sm">
+                      <button
+                        className="font-medium hover:underline"
+                        style={{ color: '#2B50C8' }}
+                        onClick={() => alert('Fitur ubah alamat belum tersedia di prototype ini.')}
+                      >
+                        Ubah Alamat
+                      </button>
+                      <span className="text-gray-300">|</span>
+                      <button
+                        className="font-medium text-gray-500 hover:underline"
+                        onClick={() => alert('Fitur hapus alamat belum tersedia di prototype ini.')}
+                      >
+                        Hapus
+                      </button>
+                    </div>
+                  )}
+                </div>
+              ))}
             </div>
           </div>
         </div>
