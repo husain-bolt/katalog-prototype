@@ -26,7 +26,7 @@ export const ADDRESS_BOOK = [
     labelAlamat: 'Kantor HQ',
     name: 'Namora',
     phone: '082111111111',
-    address: 'Jl. Holis Regency No.37A, Babakan Babakan Ciparay, Bandung City, West Java 40222',
+    address: 'Jl. Bonara No.37A, Babakan Babakan Ciparay, Bandung City, West Java 40222',
     pinpoint: true,
   },
   {
@@ -34,8 +34,8 @@ export const ADDRESS_BOOK = [
     isPrimary: false,
     labelAlamat: 'Kantor Cabang 1',
     name: 'Husain',
-    phone: '082111111111',
-    address: 'Jl. Holis Regency No.37A, Babakan Babakan Ciparay, Bandung City, West Java 40222',
+    phone: '0822222222',
+    address: 'Jl. Jionara No.37A, Babakan Babakan Ciparay, Bandung City, West Java 40222',
     pinpoint: true,
   },
   {
@@ -43,8 +43,8 @@ export const ADDRESS_BOOK = [
     isPrimary: false,
     labelAlamat: 'Kantor Cabang 2',
     name: 'Cahyo',
-    phone: '082111111111',
-    address: 'Jl. Holis Regency No.37A, Babakan Babakan Ciparay, Bandung City, West Java 40222',
+    phone: '0823333333',
+    address: 'Jl. Ventura No.37A, Babakan Babakan Ciparay, Bandung City, West Java 40222',
     pinpoint: true,
   },
 ];
