@@ -74,7 +74,7 @@ export default function Step3() {
         <div className="mb-6 flex items-center justify-between">
           <div className="flex items-start gap-3">
             <button
-              onClick={() => router.push('/step1')}
+              onClick={() => router.push('/Atur-Pengiriman')}
               aria-label="Kembali"
               className="mt-1 text-gray-700 hover:text-black"
             >
@@ -89,7 +89,7 @@ export default function Step3() {
         <div className="mb-3 flex items-center justify-between">
           <p className="font-semibold text-gray-800">Lokasi Pengiriman ({locations.length})</p>
           <button
-            onClick={() => router.push('/step1')}
+            onClick={() => router.push('/Atur-Pengiriman')}
             className="flex items-center gap-1 rounded-lg border border-brand px-4 py-2 text-sm font-semibold text-brand hover:bg-brand-light"
           >
             + Tambah Lokasi Pengiriman

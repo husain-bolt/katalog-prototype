@@ -121,7 +121,7 @@ export default function Step1() {
         JSON.stringify([...existing, newLocation])
       );
     }
-    router.push('/step3');
+    router.push('/Daftar-Pengiriman');
   }
 
   return (
